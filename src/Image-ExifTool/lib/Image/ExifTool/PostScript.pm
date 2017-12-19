@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.41';
+$VERSION = '1.38';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -77,7 +77,6 @@ sub ProcessPS($$;$);
         },
     },
     TIFFPreview => {
-        Groups => { 2 => 'Preview' },
         Binary => 1,
         Notes => q{
             not a real tag ID, but used to represent the TIFF preview extracted from DOS
@@ -328,10 +327,7 @@ sub ProcessPS($$;$)
     my ($data, $dos, $endDoc, $fontTable, $comment);
 
     # allow read from data
-    unless ($raf) {
-        $raf = new File::RandomAccess($$dirInfo{DataPt});
-        $et->VerboseDir('PostScript');
-    }
+    $raf = new File::RandomAccess($$dirInfo{DataPt}) unless $raf;
 #
 # determine if this is a postscript file
 #
@@ -387,7 +383,6 @@ sub ProcessPS($$;$)
         $raf->Seek($pos, 0);
     }
     $et->SetFileType($type);
-    return 1 if $$et{OPTIONS}{FastScan} and $$et{OPTIONS}{FastScan} == 3;
 #
 # extract TIFF information from DOS header
 #
@@ -674,7 +669,7 @@ This code reads meta information from EPS (Encapsulated PostScript), PS
 
 =head1 AUTHOR
 
-Copyright 2003-2017, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

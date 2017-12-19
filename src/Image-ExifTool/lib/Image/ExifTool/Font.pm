@@ -19,7 +19,7 @@ use strict;
 use vars qw($VERSION %ttLang);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.07';
 
 sub ProcessOTF($$);
 
@@ -346,7 +346,6 @@ sub ProcessTTC($$)
     # might as well put a limit on the number of fonts we will parse (< 256)
     return 0 unless $num < 0x100 and $raf->Read($buff, $num * 4) == $num * 4;
     $et->SetFileType('TTC');
-    return 1 if $$et{OPTIONS}{FastScan} and $$et{OPTIONS}{FastScan} == 3;
     my $tagTablePtr = GetTagTable('Image::ExifTool::Font::Main');
     $et->HandleTag($tagTablePtr, 'numfonts', $num);
     # loop through all fonts in the collection
@@ -377,7 +376,6 @@ sub ProcessOTF($$)
     return 0 unless $buff =~ /^(\0\x01\0\0|OTTO|true|typ1|\xa5(kbd|lst))[\0\x01]/;
 
     $et->SetFileType($1 eq 'OTTO' ? 'OTF' : 'TTF');
-    return 1 if $$et{OPTIONS}{FastScan} and $$et{OPTIONS}{FastScan} == 3;
     SetByteOrder('MM');
     my $numTables = Get16u(\$buff, 4);
     return 0 unless $numTables > 0 and $numTables < 0x200;
@@ -515,7 +513,6 @@ sub ProcessAFM($$)
     return 0 unless $buff =~ /^Start(Comp|Master)?FontMetrics\s+\d+/;
     my $ftyp = $1 ? ($1 eq 'Comp' ? 'ACFM' : 'AMFM') : 'AFM';
     $et->SetFileType($ftyp, 'application/x-font-afm');
-    return 1 if $$et{OPTIONS}{FastScan} and $$et{OPTIONS}{FastScan} == 3;
     my $tagTablePtr = GetTagTable('Image::ExifTool::Font::AFM');
 
     for (;;) {
@@ -575,7 +572,6 @@ sub ProcessFont($$)
              $raf->Read($buf2, 11) == 11 and lc($buf2) eq "postscript\0")
     {
         $et->SetFileType('PFM');
-        return 1 if $$et{OPTIONS}{FastScan} and $$et{OPTIONS}{FastScan} == 3;
         SetByteOrder('II');
         my $tagTablePtr = GetTagTable('Image::ExifTool::Font::Main');
         # process the PFM header
@@ -615,7 +611,7 @@ types are OTF, TTF, TTC, DFONT, PFA, PFB, PFM, AFM, ACFM and AMFM.
 
 =head1 AUTHOR
 
-Copyright 2003-2017, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

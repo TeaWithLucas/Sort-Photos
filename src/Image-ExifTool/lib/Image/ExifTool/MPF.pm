@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.13';
+$VERSION = '1.09';
 
 sub ProcessMPImageList($$$);
 
@@ -26,7 +26,7 @@ sub ProcessMPImageList($$$);
         These tags are part of the CIPA Multi-Picture Format specification, and are
         found in the APP2 "MPF" segment of JPEG images.  MPImage data referenced
         from this segment is stored as a JPEG trailer.  The MPF tags are not
-        writable, however the MPF segment may be deleted as a group (with "MPF:All")
+        writable, however the MPG segment may be deleted as a group (with "MPF:All")
         but then the JPEG trailer should also be deleted (with "Trailer:All").  See
         L<http://www.cipa.jp/std/documents/e/DC-007_E.pdf> for the official
         specification.
@@ -72,7 +72,7 @@ sub ProcessMPImageList($$$);
                 0x40 => 'Zigzag (column start)',
             },
         ],
-    },
+    },          
     0xb202 => 'PanOverlapH',
     0xb203 => 'PanOverlapV',
     0xb204 => 'BaseViewpointNum',
@@ -154,7 +154,7 @@ sub ProcessMPImageList($$$);
 
 # extract MP Images as composite tags
 %Image::ExifTool::MPF::Composite = (
-    GROUPS => { 2 => 'Preview' },
+    GROUPS => { 2 => 'Image' },
     MPImage => {
         Require => {
             0 => 'MPImageStart',
@@ -169,7 +169,6 @@ sub ProcessMPImageList($$$);
         # extract all MPF images (not just one)
         RawConv => q{
             require Image::ExifTool::MPF;
-            @grps = $self->GetGroup($$val{0});  # set groups from input tag
             Image::ExifTool::MPF::ExtractMPImages($self);
         },
     },
@@ -192,8 +191,8 @@ sub ExtractMPImages($)
     for ($i=1; $xtra or not defined $xtra; ++$i) {
         # run through MP images in the same order they were extracted
         $xtra = defined $$et{VALUE}{"MPImageStart ($i)"} ? " ($i)" : '';
-        my $off = $et->GetValue("MPImageStart$xtra", 'ValueConv');
-        my $len = $et->GetValue("MPImageLength$xtra", 'ValueConv');
+        my $off = $et->GetValue("MPImageStart$xtra");
+        my $len = $et->GetValue("MPImageLength$xtra");
         if ($off and $len) {
             my $type = $et->GetValue("MPImageType$xtra", 'ValueConv');
             my $tag = "MPImage$i";
@@ -209,10 +208,15 @@ sub ExtractMPImages($)
             unless ($Image::ExifTool::Extra{$tag}) {
                 AddTagToTable(\%Image::ExifTool::Extra, $tag, {
                     Name => $tag,
-                    Groups => { 0 => 'Composite', 1 => 'Composite', 2 => 'Preview'},
+                    Groups => { 0 => 'Composite', 1 => 'Composite', 2 => 'Image'},
                 });
             }
-            my $key = $et->FoundTag($tag, $val, $et->GetGroup("MPImageStart$xtra"));
+            my $key = $et->FoundTag($tag, $val);
+            # set groups for PreviewImage
+            if ($tag eq 'PreviewImage') {
+                $et->SetGroup($key, 'Composite', 0);
+                $et->SetGroup($key, 'Composite');
+            }
             # extract information from MP images if ExtractEmbedded option used
             if ($ee) {
                 my $oldBase = $$et{BASE};
@@ -266,7 +270,7 @@ Format (MPF) information from JPEG images.
 
 =head1 AUTHOR
 
-Copyright 2003-2017, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -4,7 +4,6 @@
 # Description:  Read Ogg meta information
 #
 # Revisions:    2011/07/13 - P. Harvey Created (split from Vorbis.pm)
-#               2016/07/14 - PH Added Ogg Opus support
 #
 # References:   1) http://www.xiph.org/vorbis/doc/
 #               2) http://flac.sourceforge.net/ogg_mapping.html
@@ -17,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.01';
 
 my $MAX_PACKETS = 2;    # maximum packets to scan from each stream at start of file
 
@@ -30,7 +29,6 @@ my $MAX_PACKETS = 2;    # maximum packets to scan from each stream at start of f
     # (these are for documentation purposes only, and aren't used by the code below)
     vorbis => { SubDirectory => { TagTable => 'Image::ExifTool::Vorbis::Main' } },
     theora => { SubDirectory => { TagTable => 'Image::ExifTool::Theora::Main' } },
-    Opus   => { SubDirectory => { TagTable => 'Image::ExifTool::Opus::Main' } },
     FLAC   => { SubDirectory => { TagTable => 'Image::ExifTool::FLAC::Main' } },
     ID3    => { SubDirectory => { TagTable => 'Image::ExifTool::ID3::Main' } },
 );
@@ -43,19 +41,18 @@ sub ProcessPacket($$)
 {
     my ($et, $dataPt) = @_;
     my $rtnVal = 0;
-    if ($$dataPt =~ /^(.)(vorbis|theora)/s or $$dataPt =~ /^(OpusHead|OpusTags)/) {
-        my ($tag, $type, $pos) = $2 ? (ord($1), ucfirst($2), 7) : ($1, 'Opus', 8);
+    if ($$dataPt =~ /^(.)(vorbis|theora)/s) {
+        my ($tag, $type) = (ord($1), ucfirst($2));
         # this is an OGV file if it contains Theora video
         $et->OverrideFileType('OGV') if $type eq 'Theora' and $$et{FILE_TYPE} eq 'OGG';
-        $et->OverrideFileType('OPUS') if $type eq 'Opus' and $$et{FILE_TYPE} eq 'OGG';
         my $tagTablePtr = GetTagTable("Image::ExifTool::${type}::Main");
         my $tagInfo = $et->GetTagInfo($tagTablePtr, $tag);
         return 0 unless $tagInfo and $$tagInfo{SubDirectory};
         my $subdir = $$tagInfo{SubDirectory};
         my %dirInfo = (
-            DataPt   => $dataPt,
-            DirName  => $$tagInfo{Name},
-            DirStart => $pos,
+            DataPt => $dataPt,
+            DirName => $$tagInfo{Name},
+            DirStart => 7,
         );
         my $table = GetTagTable($$subdir{TagTable});
         # set group1 so Theoris comments can be distinguised from Vorbis comments
@@ -170,7 +167,7 @@ sub ProcessOGG($$)
             $val{$stream} .= $buff;     # add this continuation page
         } elsif (not $flag & 0x01) {    # ignore remaining pages of a continued packet
             # ignore the first page of any packet we aren't parsing
-            if ($buff =~ /^(.(vorbis|theora)|Opus(Head|Tags))/s) {
+            if ($buff =~ /^(.)(vorbis|theora)/s) {
                 $val{$stream} = $buff;      # save this page
             } elsif ($buff =~ /^\x7fFLAC..(..)/s) {
                 $numFlac = unpack('n',$1);
@@ -214,7 +211,7 @@ information from Ogg bitstream container files.
 
 =head1 AUTHOR
 
-Copyright 2003-2017, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

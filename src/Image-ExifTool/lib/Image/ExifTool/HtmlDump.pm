@@ -13,7 +13,7 @@ use vars qw($VERSION);
 use Image::ExifTool;    # only for FinishTiffDump()
 use Image::ExifTool::HTML qw(EscapeHTML);
 
-$VERSION = '1.34';
+$VERSION = '1.32';
 
 sub DumpTable($$$;$$$$$);
 sub Open($$$;@);
@@ -383,9 +383,7 @@ sub Print($$;$$$$$)
             for ($try=0; $try<2; ++$try) {
                 $end = $start + $len;
                 # only load as much of the block as we are going to dump
-                # (read 32 more bytes than necessary just in case there
-                # is only one skipped line that we decide to print)
-                my $size = ($len > $limit + 32) ? $limit / 2 + 16 : $len;
+                my $size = ($len > $limit) ? $limit / 2 : $len;
                 if ($start >= $dataPos and $end <= $dataEnd) {
                     $buff = substr($$dataPt, $start-$dataPos, $size);
                     if ($len != $size) {
@@ -739,7 +737,6 @@ sub FinishTiffDump($$$)
         AlphaOffset       => 'AlphaByteCount',
         MPImageStart      => 'MPImageLength',
         IDCPreviewStart   => 'IDCPreviewLength',
-        SamsungRawPointersOffset => 'SamsungRawPointersLength',
     );
 
     # add TIFF data to html dump
@@ -885,7 +882,7 @@ page.
 
 =head1 AUTHOR
 
-Copyright 2003-2017, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
