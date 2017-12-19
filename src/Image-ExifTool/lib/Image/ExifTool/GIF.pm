@@ -11,7 +11,6 @@
 #               2) http://www.adobe.com/devnet/xmp/
 #               3) http://graphcomp.com/info/specs/ani_gif.html
 #               4) http://www.color.org/icc_specs2.html
-#               5) http://www.midiox.com/mmgif.htm
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::GIF;
@@ -20,7 +19,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.14';
+$VERSION = '1.11';
 
 # road map of directory locations in GIF images
 my %gifMap = (
@@ -51,38 +50,15 @@ my %gifMap = (
     ScreenDescriptor => {
         SubDirectory => { TagTable => 'Image::ExifTool::GIF::Screen' },
     },
-    Extensions => { # (for documentation only)
-        SubDirectory => { TagTable => 'Image::ExifTool::GIF::Extensions' },
+    # GIF89a application extensions:
+    ExtensionAnimation => {
+        SubDirectory => { TagTable => 'Image::ExifTool::GIF::Animate' },
     },
-);
-
-# GIF89a application extensions:
-%Image::ExifTool::GIF::Extensions = (
-    GROUPS => { 2 => 'Image' },
-    NOTES => 'Tags extracted from GIF89a application extensions.',
-    'NETSCAPE/2.0' => { #3
-        Name => 'Animation',
-        SubDirectory => { TagTable => 'Image::ExifTool::GIF::Animation' },
-    },
-    'XMP Data/XMP' => { #2
-        Name => 'XMP',
-        IncludeLengthBytes => 1, # length bytes are included in the data
-        Writable => 1,
+    ExtensionXMP => { # (for documentation only)
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
     },
-    'ICCRGBG1/012' => { #4
-        Name => 'ICC_Profile',
-        Writable => 1,
+    ExtensionICC => { # (for documentation only)
         SubDirectory => { TagTable => 'Image::ExifTool::ICC_Profile::Main' },
-    },
-    'MIDICTRL/Jon' => { #5
-        Name => 'MIDIControl',
-        SubDirectory => { TagTable => 'Image::ExifTool::GIF::MIDIControl' },
-    },
-    'MIDISONG/Dm7' => { #5
-        Name => 'MIDISong',
-        Groups => { 2 => 'Audio' },
-        Binary => 1,
     },
 );
 
@@ -117,37 +93,15 @@ my %gifMap = (
     5 => 'BackgroundColor',
 );
 
-# GIF Netscape 2.0 animation extension (ref 3)
-%Image::ExifTool::GIF::Animation = (
+# GIF Netscape 2.0 animation extension
+%Image::ExifTool::GIF::Animate = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Image' },
     NOTES => 'Information extracted from the "NETSCAPE2.0" animation extension.',
-    1 => {
+    2 => {
         Name => 'AnimationIterations',
         Format => 'int16u',
         PrintConv => '$val ? $val : "Infinite"',
-    },
-);
-
-# GIF MIDICTRL extension (ref 5)
-%Image::ExifTool::GIF::MIDIControl = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 2 => 'Audio' },
-    NOTES => 'Information extracted from the MIDI control block extension.',
-    0 => 'MIDIControlVersion',
-    1 => 'SequenceNumber',
-    2 => 'MelodicPolyphony',
-    3 => 'PercussivePolyphony',
-    4 => {
-        Name => 'ChannelUsage',
-        Format => 'int16u',
-        PrintConv => 'sprintf("0x%.4x", $val)',
-    },
-    6 => {
-        Name => 'DelayTime',
-        Format => 'int16u',
-        ValueConv => '$val / 100',
-        PrintConv => '$val . " s"',
     },
 );
 
@@ -183,7 +137,7 @@ sub ProcessGIF($$)
         $addDirs = $$et{ADD_DIRS};
         # determine if we are editing the File:Comment tag
         my $delGroup = $$et{DEL_GROUP};
-        $newComment = $et->GetNewValue('Comment', \$nvComment);
+        $newComment = $et->GetNewValues('Comment', \$nvComment);
         $setComment = 1 if $nvComment or $$delGroup{File};
         # change to GIF 89a if adding comment, XMP or ICC_Profile
         $buff = 'GIF89a' if $$addDirs{XMP} or $$addDirs{ICC_Profile} or defined $newComment;
@@ -226,7 +180,7 @@ Block:
                 Write($outfile, "\0") or $err = 1;  # empty chunk as terminator
                 undef $newComment;
                 undef $nvComment;   # delete any other extraneous comments
-                ++$$et{CHANGED};    # increment file changed flag
+                ++$$et{CHANGED};     # increment file changed flag
             }
             # add application extension containing XMP block if necessary
             # (this will place XMP before the first non-extension block)
@@ -336,7 +290,7 @@ Block:
                     if ($nvComment) {
                         $isOverwriting = $et->IsOverwriting($nvComment,$comment);
                         # get new comment again (may have been shifted)
-                        $newComment = $et->GetNewValue($nvComment) if defined $newComment;
+                        $newComment = $et->GetNewValues($nvComment) if defined $newComment;
                     } else {
                         # group delete, or deleting additional comments after writing one
                         $isOverwriting = 1;
@@ -379,91 +333,119 @@ Block:
         } elsif ($a == 0xff and $length == 0x0b) {  # application extension
 
             last unless $raf->Read($buff, $length) == $length;
-            my $hdr = "$ch$s$buff";
-            # add "/" for readability
-            my $tag = substr($buff, 0, 8) . '/' . substr($buff, 8);
-            $tag =~ tr/\0-\x1f//d;   # remove nulls and control characters
-            $verbose and print $out "Application Extension: $tag\n";
-
-            my $extTable = GetTagTable('Image::ExifTool::GIF::Extensions');
-            my $extInfo = $$extTable{$tag};
-            my ($subdir, $inclLen, $justCopy);
-            if ($extInfo) {
-                $subdir = $$extInfo{SubDirectory};
-                $inclLen = $$extInfo{IncludeLengthBytes};
-                # rewrite as-is unless this is a writable subdirectory
-                $justCopy = 1 if $outfile and (not $subdir or not $$extInfo{Writable});
-            } else {
-                $justCopy = 1 if $outfile;
+            if ($verbose) {
+                my @a = unpack('a8a3', $buff);
+                s/\0.*//s foreach @a;
+                print $out "Application Extension: @a\n";
             }
-            Write($outfile, $hdr) or $err = 1 if $justCopy;
+            if ($buff eq 'XMP DataXMP') {   # XMP data (ref 2)
 
-            # read the extension data
-            my $dat = '';
-            for (;;) {
-                $raf->Read($ch, 1) or last Block;   # read next block header
-                $length = ord($ch) or last;         # get next block size
-                $raf->Read($buff, $length) == $length or last Block;
-                Write($outfile, $ch, $buff) or $err = 1 if $justCopy;
-                $dat .= $inclLen ? $ch . $buff : $buff;
-            }
-            Write($outfile, "\0") if $justCopy;
-
-            if ($subdir) {
-                my $dirLen = length $dat;
-                my $name = $$extInfo{Name};
-                if ($name eq 'XMP') {
-                    # get length of XMP without landing zone data
-                    # (note that LZ data may not be exactly the same as what we use)
-                    $dirLen = pos($dat) if $dat =~ /<\?xpacket end=['"][wr]['"]\?>/g;
+                my $hdr = "$ch$s$buff";
+                # read XMP data
+                my $xmp = '';
+                for (;;) {
+                    $raf->Read($ch, 1) or last Block;   # read next block header
+                    $length = ord($ch) or last;         # get next block size
+                    $raf->Read($buff, $length) == $length or last Block;
+                    $xmp .= $ch . $buff;
+                }
+                # get length of XMP without landing zone data
+                # (note that LZ data may not be exactly the same as what we use)
+                my $xmpLen;
+                if ($xmp =~ /<\?xpacket end=['"][wr]['"]\?>/g) {
+                    $xmpLen = pos($xmp);
+                } else {
+                    $xmpLen = length($xmp);
                 }
                 my %dirInfo = (
-                    DataPt  => \$dat,
-                    DataLen => length $dat,
-                    DirLen  => $dirLen,
-                    DirName => $name,
+                    DataPt  => \$xmp,
+                    DataLen => length $xmp,
+                    DirLen  => $xmpLen,
                     Parent  => 'GIF',
                 );
-                my $subTable = GetTagTable($$subdir{TagTable});
-                if (not $outfile) {
-                    $et->ProcessDirectory(\%dirInfo, $subTable);
-                } elsif ($$extInfo{Writable}) {
-                    if ($doneDir{$name} and $doneDir{$name} > 1) {
-                        $et->Warn("Duplicate $name block created");
+                my $xmpTable = GetTagTable('Image::ExifTool::XMP::Main');
+                if ($outfile) {
+                    if ($doneDir{XMP} and $doneDir{XMP} > 1) {
+                        $et->Warn('Duplicate XMP block created');
                     }
-                    $buff = $et->WriteDirectory(\%dirInfo, $subTable);
-                    if (defined $buff) {
-                        next unless length $buff;   # delete this extension if length is zero
-                        # check for null just to be safe
-                        $et->Error("$name contained NULL character") if $buff =~ /\0/;
-                        $dat = $buff;
-                        # add landing zone (without terminator, which will be added later)
-                        $dat .= pack('C*',1,reverse(0..255)) if $$extInfo{IncludeLengthBytes};
-                    } # (else rewrite original data)
+                    $buff = $et->WriteDirectory(\%dirInfo, $xmpTable);
+                    if (not defined $buff) {
+                        # rewrite original XMP with landing zone (adding back null terminator)
+                        Write($outfile, $hdr, $xmp, "\0") or $err = 1;
+                        $doneDir{XMP} = 1;
+                    } elsif (length $buff) {
+                        if ($buff =~ /\0/) { # (check just to be safe)
+                            $et->Error('XMP contained NULL character');
+                        } else {
+                            # write new XMP and landing zone
+                            my $lz = pack('C*',1,reverse(0..255),0);
+                            Write($outfile, $hdr, $buff, $lz) or $err = 1;
+                        }
+                        $doneDir{XMP} = 1;
+                    } # else we are deleting the XMP
+                } else {
+                    $et->ProcessDirectory(\%dirInfo, $xmpTable);
+                }
+                next;
 
-                    $doneDir{$name} = 1;
+            } elsif ($buff eq 'ICCRGBG1012') {      # ICC_Profile extension (ref 4)
 
-                    if ($$extInfo{IncludeLengthBytes}) {
-                        # write data and landing zone
-                        Write($outfile, $hdr, $dat) or $err = 1;
-                    } else {
-                        # write as sub-blocks
-                        Write($outfile, $hdr) or $err = 1;
+                my $hdr = "$ch$s$buff";
+                # read ICC profile data
+                my $icc_profile = '';
+                for (;;) {
+                    $raf->Read($ch, 1) or last Block;   # read next block header
+                    $length = ord($ch) or last;         # get next block size
+                    $raf->Read($buff, $length) == $length or last Block;
+                    $icc_profile .= $buff;
+                }
+                my %dirInfo = (
+                    DataPt  => \$icc_profile,
+                    DataLen => length $icc_profile,
+                    DirLen  => length $icc_profile,
+                    Parent  => 'GIF',
+                );
+                my $iccTable = GetTagTable('Image::ExifTool::ICC_Profile::Main');
+                if ($outfile) {
+                    if ($doneDir{ICC_Profile} and $doneDir{ICC_Profile} > 1) {
+                        $et->Warn('Duplicate ICC_Profile block created');
+                    }
+                    $buff = $et->WriteDirectory(\%dirInfo, $iccTable);
+                    # rewrite original ICC_Profile if nothing changed 
+                    $buff = $icc_profile unless defined $buff;
+                    if (length $buff) {
+                        # write ICC profile sub-blocks
                         my $pos = 0;
-                        my $len = length $dat;
+                        Write($outfile, $hdr) or $err = 1;
+                        my $len = length $buff;
                         while ($pos < $len) {
                             my $n = $len - $pos;
                             $n = 255 if $n > 255;
-                            Write($outfile, chr($n), substr($dat, $pos, $n)) or $err = 1;
+                            Write($outfile, chr($n), substr($buff, $pos, $n)) or $err = 1;
                             $pos += $n;
                         }
-                    }
-                    Write($outfile, "\0") or $err = 1;  # write null terminator
+                        Write($outfile, "\0") or $err = 1;  # write null terminator
+                        $doneDir{ICC_Profile} = 1;
+                    } # else we are deleting the ICC profile
+                } else {
+                    $et->ProcessDirectory(\%dirInfo, $iccTable);
                 }
-            } elsif (not $outfile) {
-                $et->HandleTag($extTable, $tag, $dat);
+                next;
+
+            } elsif ($buff eq 'NETSCAPE2.0') {      # animated GIF extension (ref 3)
+
+                $raf->Read($buff, 5) == 5 or last;
+                # make sure this contains the expected data
+                if ($buff =~ /^\x03\x01(..)\0$/s) {
+                    $et->HandleTag($tagTablePtr, 'ExtensionAnimation', $buff);
+                }
+                $raf->Seek(-$length-5, 1) or last;  # seek back to start of block
+
+            } else {
+
+                # rewind to start of application extension to copy the unknown block
+                $raf->Seek(-$length, 1) or last;
             }
-            next;
 
         } elsif ($a == 0xf9 and $length == 4) {     # graphic control extension
 
@@ -534,7 +516,7 @@ write GIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2017, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -550,8 +532,6 @@ under the same terms as Perl itself.
 =item L<http://graphcomp.com/info/specs/ani_gif.html>
 
 =item L<http://www.color.org/icc_specs2.html>
-
-=item L<http://www.midiox.com/mmgif.htm>
 
 =back
 

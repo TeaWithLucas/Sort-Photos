@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::it;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.13';
+$VERSION = '1.11';
 
 %Image::ExifTool::Lang::it::Translate = (
    'A100DataOffset' => 'Offset dati A100',
@@ -4899,7 +4899,7 @@ $VERSION = '1.13';
    'OriginalAlbum' => 'Album originale',
    'OriginalAlbumTitle' => 'Titolo album originale',
    'OriginalArtist' => 'Artista originale',
-   'OriginalFileName' => 'Nome file originale',
+   'OriginalFilename' => 'Nome file originale',
    'OriginalLyricist' => 'Paroliere originale',
    'OriginalMedia' => {
       PrintConv => {
@@ -5040,7 +5040,7 @@ $VERSION = '1.13';
       },
     },
    'PictureFormat' => 'Formato immagine',
-   'PictureMIMEType' => 'MIME type immagine',
+   'PictureMimeType' => 'Mime type immagine',
    'PictureMode' => {
       PrintConv => {
         '1/2 EV steps' => 'Step 1/2 EV',
@@ -6273,7 +6273,7 @@ $VERSION = '1.13';
     },
    'RecordingTime' => 'Tempo registrazione',
    'RedAdjust' => 'Correzione rosso',
-   'RedBalance' => 'Bilanciamento del rosso',
+   'RedBalance' => 'Bilanciamento rosso',
    'RedCurveLimits' => 'Limiti curva rosso',
    'RedCurvePoints' => 'Punti curva rosso',
    'RedEyeCorrection' => {
@@ -6769,7 +6769,7 @@ $VERSION = '1.13';
         'Change parameters' => 'Cambia parametri',
         'ISO speed' => 'Velocità ISO',
         'Normal (disabled)' => 'Normale (disabilitato)',
-        'White balance' => 'Bilanciamento del bianco',
+        'White balance' => 'Bilanciameno bianco',
       },
     },
    'SetCookie' => 'Imposta cookie',
@@ -7121,6 +7121,7 @@ $VERSION = '1.13';
       },
     },
    'SubsystemVersion' => 'Versione sottosistema',
+   'SubTitle' => 'Sottotitolo',
    'Subtitle' => 'Sottotitolo',
    'Suffix' => 'Suffisso',
    'SuggestedPalette' => 'Tavolozza suggerita',
@@ -7314,7 +7315,7 @@ $VERSION = '1.13';
       PrintConv => {
         'Self-timer' => 'Autoscatto',
         'Shooting Mode' => 'Modo scatto',
-        'White Balance' => 'Bilanciamento del bianco',
+        'White Balance' => 'Bilanciameno bianco',
       },
     },
    'TimerLength' => {
@@ -7322,6 +7323,7 @@ $VERSION = '1.13';
         'Enable' => 'Abilita',
       },
     },
+   'Timezone' => 'Fiso orario',
    'Tint' => 'Tinta',
    'Title' => 'Titolo',
    'Title2' => 'Titolo 2',
@@ -7729,7 +7731,7 @@ $VERSION = '1.13';
     },
    'WCSProfiles' => 'Profilo Windows Color System',
    'WhiteBalance' => {
-      Description => 'Bilanciamento del bianco',
+      Description => 'Bilanciameno bianco',
       PrintConv => {
         'Auto' => 'Equilibrio del bianco automatico',
         'Black & White' => 'Monocromatico',
@@ -7753,7 +7755,7 @@ $VERSION = '1.13';
         'White Fluorescent' => 'Fluorescente bianca',
       },
     },
-   'WhiteBalance2' => 'Bilanciamento del bianco 2',
+   'WhiteBalance2' => 'Bilanciameno bianco 2',
    'WhiteBalanceAdj' => {
       Description => 'Adattamento bilanciamento bianco',
       PrintConv => {
@@ -7900,7 +7902,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2017, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

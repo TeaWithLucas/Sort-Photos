@@ -11,10 +11,9 @@ package Image::ExifTool::Lang::pl;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.10';
+$VERSION = '1.09';
 
 %Image::ExifTool::Lang::pl::Translate = (
-   'A100DataOffset' => 'Przesunięcie danych A100',
    'AEAperture' => 'Priorytet AE',
    'AEExposureTime' => 'Czas ekspozycji AE',
    'AEInfo' => 'Informacja o automatycznej ekspozycji',
@@ -93,7 +92,6 @@ $VERSION = '1.10';
       },
     },
    'AvApertureSetting' => 'Ustawienia priorytetu przysłony Av',
-   'BadFaxLines' => 'Uszkodzone wiersze transmisji Fax',
    'BannerImageType' => {
       PrintConv => {
         'None' => 'Brak',
@@ -178,29 +176,8 @@ $VERSION = '1.10';
    'CellLength' => 'Długość komórki',
    'CellWidth' => 'Szerokość komórki',
    'City' => 'Miasto',
-   'CleanFaxData' => {
-      Description => 'Poprawne wiersze transmisji Fax',
-      PrintConv => {
-        'Clean' => 'Dobry',
-        'Regenerated' => 'Ponowiony',
-        'Unclean' => 'Niedobry',
-      },
-    },
-   'ClipPath' => 'Ścieżka obcięcia',
-   'CodingMethods' => {
-      Description => 'Metody kompresji',
-      PrintConv => {
-        'Baseline JPEG' => 'JPEG podstawowa',
-        'JBIG color' => 'JBIG kolor',
-        'Modified Huffman' => 'Huffmana zmodyfikowana',
-        'Modified MR' => 'Zmodyfikowany MR',
-        'Modified Read' => 'Zmodyfikowany odczyt',
-        'Unspecified compression' => 'Nie podane',
-      },
-    },
    'ColorFilter' => 'Filtr kolorowy',
    'ColorInfo' => 'Informacje o kolorze',
-   'ColorMap' => 'Mapa kolorów',
    'ColorMatrix1' => 'Macierz kolorów 1',
    'ColorMatrix2' => 'Macierz kolorów 2',
    'ColorSpace' => {
@@ -242,7 +219,6 @@ $VERSION = '1.10';
         'None' => 'Brak',
       },
     },
-   'ConsecutiveBadFaxLines' => 'Sekwencja uszkodzonych wierszy transmisji Fax',
    'Contrast' => {
       Description => 'Kontrast',
       PrintConv => {
@@ -284,13 +260,10 @@ $VERSION = '1.10';
         'None' => 'Brak',
       },
     },
-   'DataType' => 'Typ daty',
    'Date' => 'Data',
    'DateCreated' => 'Data utworzenia',
    'DateSent' => 'Wysłano datę',
    'DateTimeOriginal' => 'Pierwotna data i godzina',
-   'Decode' => 'Zdekodowany',
-   'DefaultImageColor' => 'Domyślny kolor w obrazie',
    'Description' => 'Opis',
    'DestinationCity' => 'Miasto przeznaczenia',
    'DestinationCityCode' => 'Kod miasta przeznaczenia',
@@ -391,19 +364,6 @@ $VERSION = '1.10';
         'Rotate 180' => '180° (dół/prawo)',
         'Rotate 270 CW' => '90° CW (lewo/dół)',
         'Rotate 90 CW' => '90° CCW (prawo/góra)',
-      },
-    },
-   'FaxProfile' => {
-      Description => 'Profil faxu (rodzaj zawartości)',
-      PrintConv => {
-        'Extended B&W lossless, F' => 'Rozszerzony cz.b. bezstratny, F',
-        'Lossless JBIG B&W, J' => 'Bezstratny JBIG cz.b., J',
-        'Lossless color and grayscale, L' => 'Bezstratne kolor i skala szarości, L',
-        'Lossy color and grayscale, C' => 'Stratne kolor i skala szarości, C',
-        'Minimal B&W lossless, S' => 'Minimalny cz.b. bezstratny, S',
-        'Mixed raster content, M' => 'Raster — zawartość mieszana, M',
-        'Multi Profiles' => 'Wiele profili',
-        'Unknown' => 'Nieznany',
       },
     },
    'FileFormat' => 'Format',
@@ -588,9 +548,6 @@ $VERSION = '1.10';
     },
    'Genre' => 'Gatunek',
    'Gradation' => 'Gradacja',
-   'GrayResponseCurve' => 'Krzywa odpowiedzi Szarości',
-   'GrayResponseUnit' => 'Wielkość jednostki dla krzywej odpowiedzi szarości',
-   'HalftoneHints' => 'Półtony',
    'Headline' => 'Nagłówek',
    'HighISONoiseReduction' => 'Redukcja szumu przy wysokim ISO',
    'HometownCity' => 'Miasto domowe',
@@ -612,7 +569,6 @@ $VERSION = '1.10';
    'ImageDescription' => 'Opis obrazu',
    'ImageEditCount' => 'Licznik przetworzonych zdjęć',
    'ImageHeight' => 'Wysokość obrazu',
-   'ImageID' => 'Identyfikator obrazu',
    'ImageProcessing' => 'Przetwarzanie obrazu',
    'ImageSize' => 'Rozmiar zdjęcia',
    'ImageTone' => {
@@ -634,20 +590,6 @@ $VERSION = '1.10';
    'ImageUniqueID' => 'Unikalny kod ID zdjęcia',
    'ImageWidth' => 'Szerokość obrazu',
    'Index' => 'Indeks',
-   'Indexed' => {
-      Description => 'Indeksowane',
-      PrintConv => {
-        'Indexed' => 'Indeksowane',
-        'Not indexed' => 'Nie indeksowane',
-      },
-    },
-   'InkNames' => 'Nazwy tuszy',
-   'InkSet' => {
-      Description => 'Zestaw tuszy',
-      PrintConv => {
-        'Not CMYK' => 'Nie CMYK',
-      },
-    },
    'Instructions' => 'Instrukcje',
    'InternalFlashMode' => 'Tryb wewnętrznej lampy',
    'InternalFlashStrength' => 'Moc wewnętrznej lampy',
@@ -661,19 +603,12 @@ $VERSION = '1.10';
     },
    'InteropOffset' => 'Znacznik wzajemnej zgodności',
    'InteropVersion' => 'Wersja wzajemnej zgodności',
-   'JPEGProc' => {
-      PrintConv => {
-        'Baseline' => 'JPEG Podstawowy',
-        'Lossless' => 'Bezstratny',
-      },
-    },
    'JPEGQuality' => {
       Description => 'Jakość',
       PrintConv => {
         'Standard' => 'Standardowa jakość',
       },
     },
-   'JPEGRestartInterval' => 'JPEG odstęp restartów',
    'Keywords' => 'Słowa kluczowe',
    'Lens' => 'Obiektyw',
    'LensID' => 'ID obiektywu',
@@ -714,7 +649,6 @@ $VERSION = '1.10';
    'MakerNote' => 'Prywatne dane DNG',
    'MakerNotes' => 'Dane producenta',
    'MaxAperture' => 'Maks. przysłona obiektywu',
-   'MaxSampleValue' => 'Maksymalny rozmiar próbki',
    'MeasurementGeometry' => {
       Description => 'Geometria pomiaru',
       PrintConv => {
@@ -737,8 +671,6 @@ $VERSION = '1.10';
         'Unknown' => 'Nieznane',
       },
     },
-   'MinSampleValue' => 'Minimalny rozmiar próbki',
-   'ModeNumber' => 'Numer trybu',
    'Model' => 'Aparat',
    'ModifiedPictureStyle' => {
       PrintConv => {
@@ -763,7 +695,6 @@ $VERSION = '1.10';
       },
     },
    'NativeDisplayInfo' => 'Informacja o natywnym(?) wyświetlaczu',
-   'Noise' => 'Szumy',
    'NoiseReduction' => {
       Description => 'Redukcja szumów',
       PrintConv => {
@@ -771,14 +702,12 @@ $VERSION = '1.10';
         'On' => 'Włączona',
       },
     },
-   'NumberofInks' => 'Liczba tuszy',
    'ObjectFileType' => {
       PrintConv => {
         'None' => 'Brak',
       },
     },
    'OldSubfileType' => {
-      Description => 'Stary typ podsekcji',
       PrintConv => {
         'Full-resolution image' => 'Obraz w pełnej rozdzielczości',
         'Reduced-resolution image' => 'Obraz o zredukowanej rozdzielczości',
@@ -799,8 +728,6 @@ $VERSION = '1.10';
         'Rotate 90 CW' => '90° CCW (prawo/góra)',
       },
     },
-   'OwnerName' => 'Nazwa właściciela',
-   'PageName' => 'Nazwa strony',
    'PageNumber' => 'Numer strony',
    'PentaxImageSize' => {
       Description => 'Rozmiar obrazu Pentax\'a',
@@ -859,13 +786,6 @@ $VERSION = '1.10';
       },
     },
    'PowerSource' => 'Zasilanie',
-   'Predictor' => {
-      Description => 'Przelicznik',
-      PrintConv => {
-        'Horizontal differencing' => 'W oparciu o różnicę w poziomie',
-        'None' => 'Bez przelicznika',
-      },
-    },
    'Preview0' => 'Podgląd 0',
    'Preview1' => 'Podgląd 1',
    'Preview2' => 'Podgląd 2',
@@ -902,12 +822,6 @@ $VERSION = '1.10';
    'ProfileDescription' => 'Opis profilu',
    'ProfileDescriptionML' => 'Wielojęzyczny opis profilu.',
    'ProfileSequenceDesc' => 'Opis sekwencji profilu',
-   'ProfileType' => {
-      Description => 'Typ profilu',
-      PrintConv => {
-        'Unspecified' => 'Nie podany',
-      },
-    },
    'ProfileVersion' => 'Wersja profilu',
    'ProgramLine' => 'Linia programu',
    'ProgramMode' => {
@@ -926,8 +840,6 @@ $VERSION = '1.10';
         'Normal' => 'Standardowa jakość',
       },
     },
-   'Rating' => 'Ocena',
-   'RatingPercent' => 'Ocena procentowo',
    'RawImageSize' => 'Rozmiar obrazu RAW',
    'RecordMode' => 'Tryb zapisu',
    'RedBalance' => 'Balans czerwonego',
@@ -968,15 +880,6 @@ $VERSION = '1.10';
    'RowsPerStrip' => 'Liczba rzędów w pasku',
    'SRFocalLength' => 'Długość fokalna SR',
    'SRResult' => 'Stabilizacja obrazu',
-   'SampleFormat' => {
-      Description => 'Format próbki',
-      PrintConv => {
-        'Float' => 'Zmienno przecinkowa',
-        'Signed' => 'Całkowita ze znakiem',
-        'Undefined' => 'Nie podano',
-        'Unsigned' => 'Całkowita bez znaku',
-      },
-    },
    'SamplesPerPixel' => 'Liczba składników',
    'Saturation' => {
       Description => 'Nasycenie',
@@ -1062,7 +965,6 @@ $VERSION = '1.10';
    'SubSecTimeDigitized' => '"Cyfrowa data i godzina, subsekundy"',
    'SubSecTimeOriginal' => '"Pierwotna data i godzina, sub-sekundy"',
    'SubfileType' => {
-      Description => 'Typ podsekcji',
       PrintConv => {
         'Full-resolution Image' => 'Obraz w pełnej rozdzielczości',
         'Reduced-resolution image' => 'Obraz o zredukowanej rozdzielczości',
@@ -1094,12 +996,6 @@ $VERSION = '1.10';
     },
    'SupplementalCategories' => 'Kategorie dodatkowe',
    'SvISOSetting' => 'Ustawienia ISO Sv',
-   'T6Options' => {
-      PrintConv => {
-        'Uncompressed' => 'Nieskompresowany',
-      },
-    },
-   'TargetPrinter' => 'Docelowa drukarka',
    'Technology' => {
       Description => 'Technologia',
       PrintConv => {
@@ -1126,7 +1022,6 @@ $VERSION = '1.10';
       },
     },
    'Text' => 'Tekst',
-   'Thresholding' => 'Progowanie',
    'ThumbnailImage' => 'Miniatura',
    'ThumbnailImageSize' => 'Rozmiar miniaturki',
    'TileByteCounts' => 'Liczba bajtów na kafelek',
@@ -1164,7 +1059,6 @@ $VERSION = '1.10';
    'Unknown' => 'Nieznany',
    'Urgency' => 'Priorytet',
    'UserComment' => 'Komentarz użytkownika',
-   'VersionYear' => 'Rok wersji',
    'VideoCardGamma' => 'Gamma karty graficznej',
    'WBAdjLighting' => {
       PrintConv => {
@@ -1224,7 +1118,6 @@ $VERSION = '1.10';
       },
     },
    'Writer-Editor' => 'Autor podpisu',
-   'XClipPathUnits' => 'Jednostki wzdłuż osi X dla ścieżki obcięcia',
    'XPosition' => 'Współrzędna X',
    'XResolution' => 'Rozdzielczość obrazu w poziomie',
    'YCbCrCoefficients' => 'Współczynniki matrycy transformacji przestrzeni barwowej',
@@ -1236,7 +1129,6 @@ $VERSION = '1.10';
       },
     },
    'YCbCrSubSampling' => 'Współczynnik podpróbkowania(?) Y do C',
-   'YClipPathUnits' => 'Jednostki wzdłuż osi Y dla ścieżki obcięcia',
    'YPosition' => 'Współrzędna Y',
    'YResolution' => 'Rozdzielczość obrazu w pionie',
    'Year' => 'Rok',
@@ -1258,7 +1150,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2017, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
