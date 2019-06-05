@@ -548,10 +548,10 @@ def sortPhotos(src_dir, dest_dir, sort_format, rename_format, recursive=False, d
 		print()
 
 	print('Files modified (' + str(len(files_modified)) + '): ')
-	for modified in files_modified:
+	for modified in sorted(files_modified):
 		print('\t' + str(modified))
 	print('Files skipped (' + str(len(files_skipped)) + '): ')
-	for skipped in files_skipped:
+	for skipped in sorted(files_skipped):
 		print('\t' + str(skipped))
 
 
