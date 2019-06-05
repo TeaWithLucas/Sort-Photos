@@ -568,7 +568,7 @@ def main():
 	parser.add_argument('-s', '--silent', action='store_true', help='don\'t display parsing details.', default=False)
 	parser.add_argument('-t', '--test', action='store_true', help='run a test.  files will not be moved/copied\ninstead you will just a list of would happen', default=False)
 	parser.add_argument('-z', '--disable-time-zone-adjust', action='store_true', help='disables time zone adjust\nuseful for devices that store local time + time zone instead of UTC + time zone', default=False)
-	parser.add_argument('--sort', type=str, default='%Y/%m-%b',	help="choose destination folder structure using datetime format \n\	https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior. \n\	Use forward slashes / to indicate subdirectory(ies) (independent of your OS convention). \n\ The default is '%%Y/%%m-%%b', which separates by year then month \n\ with both the month number and name (e.g., 2012/02-Feb).")
+	parser.add_argument('--sort', type=str, default='%Y/%Y-%m-%d',	help="choose destination folder structure using datetime format \n\	https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior. \n\	Use forward slashes / to indicate subdirectory(ies) (independent of your OS convention). \n\ The default is '%%Y/%%m-%%b', which separates by year then month \n\ with both the month number and name (e.g., 2012/02-Feb).")
 	parser.add_argument('--rename', type=str, default=None,	help="rename file using format codes \n\ https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior. \n\	default is None which just uses original filename")
 
 	parser.add_argument('--ignore-file-types', type=str, nargs='+',	default=[],	help="ignore file types\n\	default is to only ignore hidden files (.*)")
